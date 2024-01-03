@@ -4,4 +4,4 @@ postgres-data
 
 go.sum
 
-sql
+sql/*
