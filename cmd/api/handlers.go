@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"net/http"
 )
 
@@ -51,12 +50,17 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check password
+	valid, err := user.PasswordMatches(requestPayload.Password)
+	if err != nil || !valid {
+		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
+		return
+	}
 
 	// create jwt user
 	u := jwtUser{
-		ID:        1,
-		FirstName: "admin",
-		LastName:  "user",
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}
 
 	// generate tokens
@@ -66,10 +70,10 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(tokens)
+	//log.Println(tokens)
 
 	refreshedCookie := app.auth.GetRefreshCookie(tokens.RefreshToken)
 	http.SetCookie(w, refreshedCookie)
 
-	w.Write([]byte(tokens.Token))
+	app.writeJSON(w, http.StatusAccepted, tokens)
 }
