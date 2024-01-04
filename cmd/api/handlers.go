@@ -33,7 +33,7 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 	// read json payload
 
 	// validate user against database
-
+	log.Println("Here I am")
 	// check password
 
 	// create jwt user
@@ -51,6 +51,9 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(tokens)
+
+	refreshedCookie := app.auth.GetRefreshCookie(tokens.RefreshToken)
+	http.SetCookie(w, refreshedCookie)
 
 	w.Write([]byte(tokens.Token))
 }
