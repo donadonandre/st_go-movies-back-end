@@ -1,4 +1,4 @@
-# Using a routing thirdy part
+# Using a routing third part
 
 * In terminal
 
@@ -17,3 +17,10 @@ go get github.com/jackc/pgx/v4 &&
 go get github.com/jackc/pgconn
 ``
 
+# JWT
+
+* It's necessary to use third party packages 
+
+``
+go get -u github.com/golang-jwt/jwt/v4
+``
