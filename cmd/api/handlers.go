@@ -1,7 +1,9 @@
 package main
 
 import (
+	"backend/internal/models"
 	"errors"
+	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 	"strconv"
@@ -87,7 +89,8 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 			refreshToken := cookie.Value
 
 			_, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
-				return []byte(app.JWTSecret), nil
+				jwtSecretAsByte := []byte(app.JWTSecret)
+				return jwtSecretAsByte, nil
 			})
 			if err != nil {
 				app.errorJSON(w, errors.New("unauthorized"), http.StatusUnauthorized)
@@ -139,4 +142,46 @@ func (app *application) MovieCatalog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = app.writeJSON(w, http.StatusOK, movies)
+}
+
+func (app *application) GetMovie(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	movieID, err := strconv.Atoi(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	movie, err := app.DB.OneMovie(movieID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	_ = app.writeJSON(w, http.StatusOK, movie)
+}
+
+func (app *application) MovieForEdit(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	movieID, err := strconv.Atoi(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	movie, genres, err := app.DB.OneMovieForEdit(movieID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	var payload = struct {
+		Movie  *models.Movie   `json:"movie"`
+		Genres []*models.Genre `json:"genres"`
+	}{
+		Movie:  movie,
+		Genres: genres,
+	}
+
+	_ = app.writeJSON(w, http.StatusOK, payload)
 }
