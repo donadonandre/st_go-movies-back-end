@@ -1,12 +1,14 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"net/http"
 )
 
 func (app *application) routes() http.Handler {
+	// create a router mux
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
@@ -28,7 +30,7 @@ func (app *application) routes() http.Handler {
 
 		mux.Get("/movies", app.MovieCatalog)
 		mux.Get("/movies/{id}", app.MovieForEdit)
-		mux.Put("/movie/0", app.InsertMovie)
+		mux.Put("/movies/0", app.InsertMovie)
 	})
 
 	return mux

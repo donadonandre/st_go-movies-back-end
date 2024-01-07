@@ -238,8 +238,8 @@ func (m *PostgresDBRepo) InsertMovie(movie models.Movie) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `INSERT INTO movies (title, description, release_date, runtime, mpaa_rating, created_ad, updated_at, image)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+	stmt := `INSERT INTO movies (title, description, release_date, runtime, mpaa_rating, created_at, updated_at, image)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
 	var newId int
 
