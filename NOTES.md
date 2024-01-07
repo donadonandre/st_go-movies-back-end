@@ -26,3 +26,5 @@ go get -u github.com/golang-jwt/jwt/v4
 ``
 
 * It's possible to use with public and private Key but in this code, the JWT is more simple.
+  
+* Create an account in www.themoviedb.org

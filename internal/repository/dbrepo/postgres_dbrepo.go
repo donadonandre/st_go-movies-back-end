@@ -41,7 +41,7 @@ func (m *PostgresDBRepo) AllMovies() ([]*models.Movie, error) {
 
 	for rows.Next() {
 		var movie models.Movie
-		err := rows.Scan(&movie.ID, &movie.Title, &movie.ReleaseDate, &movie.RunTime, &movie.MPAARating, &movie.Description, &movie.Image, &movie.CreateAt, &movie.UpdatedAt)
+		err := rows.Scan(&movie.ID, &movie.Title, &movie.ReleaseDate, &movie.RunTime, &movie.MPAARating, &movie.Description, &movie.Image, &movie.CreatedAt, &movie.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -59,7 +59,7 @@ func (m *PostgresDBRepo) OneMovie(id int) (*models.Movie, error) {
 			FROM movies WHERE id = $1`
 
 	var movie models.Movie
-	err := m.DB.QueryRowContext(ctx, query, id).Scan(&movie.ID, &movie.Title, &movie.ReleaseDate, &movie.RunTime, &movie.MPAARating, &movie.Description, &movie.Image, &movie.CreateAt, &movie.UpdatedAt)
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(&movie.ID, &movie.Title, &movie.ReleaseDate, &movie.RunTime, &movie.MPAARating, &movie.Description, &movie.Image, &movie.CreatedAt, &movie.UpdatedAt)
 	if err != nil {
 		//if err == sql.ErrNoRows {
 		//	return nil, nil
@@ -106,7 +106,7 @@ func (m *PostgresDBRepo) OneMovieForEdit(id int) (*models.Movie, []*models.Genre
 			FROM movies WHERE id = $1`
 
 	var movie models.Movie
-	err := m.DB.QueryRowContext(ctx, query, id).Scan(&movie.ID, &movie.Title, &movie.ReleaseDate, &movie.RunTime, &movie.MPAARating, &movie.Description, &movie.Image, &movie.CreateAt, &movie.UpdatedAt)
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(&movie.ID, &movie.Title, &movie.ReleaseDate, &movie.RunTime, &movie.MPAARating, &movie.Description, &movie.Image, &movie.CreatedAt, &movie.UpdatedAt)
 	if err != nil {
 		//if err == sql.ErrNoRows {
 		//	return nil, nil
@@ -232,4 +232,53 @@ func (m *PostgresDBRepo) AllGenres() ([]*models.Genre, error) {
 	}
 
 	return genres, nil
+}
+
+func (m *PostgresDBRepo) InsertMovie(movie models.Movie) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `INSERT INTO movies (title, description, release_date, runtime, mpaa_rating, created_ad, updated_at, image)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+
+	var newId int
+
+	err := m.DB.QueryRowContext(ctx, stmt,
+		movie.Title,
+		movie.Description,
+		movie.ReleaseDate,
+		movie.RunTime,
+		movie.MPAARating,
+		movie.CreatedAt,
+		movie.UpdatedAt,
+		movie.Image,
+	).Scan(&newId)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return newId, nil
+}
+
+func (m *PostgresDBRepo) UpdateMovieGenres(id int, genreIDs []int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `DELETE FROM movies_genres WHERE movie_id = $1`
+
+	_, err := m.DB.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	for _, n := range genreIDs {
+		stmt := `INSERT INTO movies_genres (movie_id, genre_id) VALUES ($1, $2)`
+		_, err := m.DB.ExecContext(ctx, stmt, id, n)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -10,7 +10,7 @@ type Movie struct {
 	MPAARating  string    `json:"mpaa_rating"`
 	Description string    `json:"description"`
 	Image       string    `json:"image"`
-	CreateAt    time.Time `json:"create_at"`
+	CreatedAt   time.Time `json:"create_at"`
 	UpdatedAt   time.Time `json:"-"`
 	Genres      []*Genre  `json:"genres,omitempty"`
 	GenresArray []int     `json:"genres_array,omitempty"`
