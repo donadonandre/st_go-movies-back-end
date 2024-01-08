@@ -49,3 +49,9 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gomovies ./cmd/api
 ``
 
 * A file called 'gomovies' will be created
+
+### Database
+
+``
+pg_dump --no-owner -h localhost -p 5432 -U postgres movies > movies.sql
+``
