@@ -38,3 +38,14 @@ go get -u github.com/golang-jwt/jwt/v4
 ``
 go get github.com/graphql-go/graphql
 ``
+
+## Production
+
+* Change middleware.go
+* In mac and linux servers:
+
+``
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gomovies ./cmd/api
+``
+
+* A file called 'gomovies' will be created
