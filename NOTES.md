@@ -55,3 +55,26 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gomovies ./cmd/api
 ``
 pg_dump --no-owner -h localhost -p 5432 -U postgres movies > movies.sql
 ``
+
+## WebServer Production
+
+https://caddyserver.com
+https://nginx.org/en/
+
+* Inside ubuntu server
+
+``
+sudo apt search supervisor
+``
+
+`
+sudo apt install supervisor
+`
+
+* After see how to install caddy
+* Use SCP like a upload files
+
+`
+scp build.tgz user@url:/home/folder
+`
+
